@@ -1,14 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand/v2"
 	"net/http"
 	"os"
+
+	"strconv"
+
+	"github.com/joho/godotenv"
 )
 
-func getFiles(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("List of files:")
+type Response struct {
+	Url string `json:"url"`
 }
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +35,26 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Uploaded file Name : ", handler.Filename)
 	fmt.Println("Uploaded file size: ", handler.Size)
 
-	dst, err := os.Create("../file_storage/" + handler.Filename)
+	files, err := os.ReadDir("../file_storage")
+	if err != nil {
+		fmt.Println("Error reading directory:", err)
+	}
+
+	fileExists := false
+	for _, file := range files {
+		if file.Name() == handler.Filename {
+			fileExists = true
+			break
+		}
+	}
+
+	newFileName := handler.Filename
+	randNum := rand.IntN(100)
+	if fileExists {
+		newFileName = strconv.Itoa(randNum) + "_" + newFileName
+	}
+
+	dst, err := os.Create("../file_storage/" + newFileName)
 
 	if err != nil {
 		fmt.Println("Error creating file:", err)
@@ -46,18 +71,38 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer dst.Close()
+	domain := os.Getenv("DOMAIN")
+	if domain == "" {
+		domain = "http://localhost:8000"
+	}
+	res_url := domain + "/file_storage/" + newFileName
 
-	fmt.Fprintf(w, "File uploaded successfully")
+	w.Header().Set("Content-Type", "application/json")
+	res := Response{
+		Url: res_url,
+	}
+	json.NewEncoder(w).Encode(res)
 
 }
 
 func main() {
-	http.HandleFunc("/files", getFiles)
+	err1 := godotenv.Load("../.env")
+	if err1 != nil {
+		fmt.Println("Error loading .env file")
+	}
+	fs := http.FileServer(http.Dir("../file_storage"))
+	http.Handle("/file_storage/", http.StripPrefix("/file_storage/", fs))
 	http.HandleFunc("/upload", uploadFile)
 
 	fmt.Println("Server started on port 8000")
 
-	err := http.ListenAndServe(":8000", nil)
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "8000"
+	}
+
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		fmt.Println("Error starting server:", err)
 		os.Exit(1)
