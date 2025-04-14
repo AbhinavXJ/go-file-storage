@@ -98,7 +98,8 @@ func main() {
 		os.Exit(1)
 	}
 	fs := http.FileServer(http.Dir("file_storage"))
-	http.Handle("file_storage/", http.StripPrefix("file_storage/", fs))
+	http.Handle("/file_storage/", http.StripPrefix("/file_storage/", fs))
+
 	http.Handle("/", http.FileServer(http.Dir("static")))
 
 	http.HandleFunc("/upload", uploadFile)
