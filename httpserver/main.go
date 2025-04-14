@@ -93,6 +93,8 @@ func main() {
 	}
 	fs := http.FileServer(http.Dir("file_storage"))
 	http.Handle("file_storage/", http.StripPrefix("file_storage/", fs))
+	http.Handle("/", http.FileServer(http.Dir("static")))
+
 	http.HandleFunc("/upload", uploadFile)
 
 	fmt.Println("Server started on port 8000")
