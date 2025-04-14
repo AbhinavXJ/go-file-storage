@@ -1,19 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
-  </head>
-  <body>
-    <form
-      enctype="multipart/form-data"
-      action="https://go-file-storage.onrender.com/upload"
-      method="post"
-    >
-      <input type="file" name="myFile" />
-      <input type="submit" value="upload" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>File Upload</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .upload-container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .upload-container h1 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+    }
+    
+    .file-input-container {
+      position: relative;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .file-input-container input[type="file"] {
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      z-index: 2;
+    }
+    
+    .file-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed #c3cfe2;
+      border-radius: 8px;
+      padding: 40px 20px;
+      width: 100%;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .file-icon {
+      font-size: 48px;
+      color: #6c63ff;
+      margin-bottom: 15px;
+    }
+    
+    .file-label:hover {
+      border-color: #6c63ff;
+      background-color: rgba(108, 99, 255, 0.05);
+    }
+    
+    .file-text {
+      color: #666;
+      margin-top: 10px;
+    }
+    
+    .selected-file {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      color: #333;
+      width: 100%;
+      display: none;
+    }
+    
+    .upload-btn {
+      background-color: #6c63ff;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    
+    .upload-btn:hover {
+      background-color: #5a52d5;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+    }
+    
+    .upload-btn:active {
+      transform: translateY(0);
+    }
+    
+    .footer {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+    
+    .footer p {
+      margin-bottom: 15px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    
+    .social-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #f2f2f2;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .social-links a:hover {
+      background-color: #6c63ff;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .social-icon {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="upload-container">
+    <h1>Upload Your File</h1>
+    <form enctype="multipart/form-data" action="https://go-file-storage.onrender.com/upload" method="post">
+      <div class="file-input-container">
+        <input type="file" name="myFile" id="fileInput" onchange="updateFileName()" />
+        <label for="fileInput" class="file-label">
+          <div class="file-icon">📁</div>
+          <div>Drop files here or click to browse</div>
+          <div class="file-text">Supports all file types</div>
+        </label>
+        <div class="selected-file" id="fileName"></div>
+      </div>
+      <button type="submit" class="upload-btn">Upload File</button>
     </form>
-  </body>
+  </div>
+  
+  <div class="footer">
+    <p>Created by Abhinav Jha</p>
+    <div class="social-links">
+      <a href="https://github.com/AbhinavXJ" target="_blank" title="GitHub">
+        <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"></path>
+        </svg>
+      </a>
+      <a href="https://linkedin.com/in/AbhinavXJ" target="_blank" title="LinkedIn">
+        <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"></path>
+          <rect x="2" y="9" width="4" height="12"></rect>
+          <circle cx="4" cy="4" r="2"></circle>
+        </svg>
+      </a>
+      <a href="https://twitter.com/AbhinavXJ" target="_blank" title="Twitter">
+        <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function updateFileName() {
+      const input = document.getElementById('fileInput');
+      const fileNameDisplay = document.getElementById('fileName');
+      
+      if (input.files.length > 0) {
+        fileNameDisplay.textContent = input.files[0].name;
+        fileNameDisplay.style.display = 'block';
+      } else {
+        fileNameDisplay.style.display = 'none';
+      }
+    }
+  </script>
+</body>
 </html>
