@@ -35,7 +35,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Uploaded file Name : ", handler.Filename)
 	fmt.Println("Uploaded file size: ", handler.Size)
 
-	files, err := os.ReadDir("../file_storage")
+	files, err := os.ReadDir("file_storage")
 	if err != nil {
 		fmt.Println("Error reading directory:", err)
 	}
@@ -54,7 +54,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 		newFileName = strconv.Itoa(randNum) + "_" + newFileName
 	}
 
-	dst, err := os.Create("../file_storage/" + newFileName)
+	dst, err := os.Create("file_storage/" + newFileName)
 
 	if err != nil {
 		fmt.Println("Error creating file:", err)
@@ -86,12 +86,13 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	err1 := godotenv.Load("../.env")
+	err1 := godotenv.Load(".env")
+
 	if err1 != nil {
 		fmt.Println("Error loading .env file")
 	}
-	fs := http.FileServer(http.Dir("../file_storage"))
-	http.Handle("/file_storage/", http.StripPrefix("/file_storage/", fs))
+	fs := http.FileServer(http.Dir("file_storage"))
+	http.Handle("file_storage/", http.StripPrefix("file_storage/", fs))
 	http.HandleFunc("/upload", uploadFile)
 
 	fmt.Println("Server started on port 8000")
