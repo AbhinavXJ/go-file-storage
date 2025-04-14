@@ -91,6 +91,12 @@ func main() {
 	if err1 != nil {
 		fmt.Println("Error loading .env file")
 	}
+	// Make sure file_storage directory exists
+	err3 := os.MkdirAll("file_storage", os.ModePerm)
+	if err3 != nil {
+		fmt.Println("Error creating file_storage directory:", err3)
+		os.Exit(1)
+	}
 	fs := http.FileServer(http.Dir("file_storage"))
 	http.Handle("file_storage/", http.StripPrefix("file_storage/", fs))
 	http.Handle("/", http.FileServer(http.Dir("static")))
